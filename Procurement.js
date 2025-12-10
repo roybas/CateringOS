@@ -1,4 +1,9 @@
 // ==========================================
+// הגדרות גלובליות (Global Configuration)
+// ==========================================
+var LIBRARY_FOLDER_ID = "1lHD_KgM-r42WeFC_HdKt6xjhS6LdC0wv";
+
+// ==========================================
 // מודול ראשי: תזמור התהליך (Main Orchestrator)
 // ==========================================
 function main() {
@@ -126,19 +131,36 @@ function writeToSheet(shoppingList) {
 
   sheet.clear();
   
-  var table = [["שם הפריט", "כמות", "יחידה", "להכנה?"]];
+  // כותרות עם עמודת "עמדה" חדשה
+  var table = [["שם הפריט", "כמות", "יחידה", "עמדה", "להכנה?"]];
   var parentRows = [];
 
   shoppingList.forEach(function(item) {
+    var stationDisplay;
+    var createChildren = false;
+    
+    // בדיקה: כמה מקורות יש?
+    if (item.sources.length === 1) {
+      // מקור יחיד - נציג אותו ישירות בעמודה
+      stationDisplay = item.sources[0].name;
+      createChildren = false;
+    } else {
+      // מספר מקורות - נפרט בשורות ילדים
+      stationDisplay = "מרוכז";
+      createChildren = true;
+    }
+    
     // שורת האב
-    table.push([item.name, item.totalQuantity, item.unit, false]);
+    table.push([item.name, item.totalQuantity, item.unit, stationDisplay, false]);
     parentRows.push(table.length); // שומרים אינדקס להדגשה
 
-    // שורות הבנים (פירוט)
-    item.sources.forEach(function(src) {
-      var detail = "     ↳ " + src.name + " (" + src.quantity + ")";
-      table.push([detail, "", "", ""]);
-    });
+    // שורות הבנים (רק אם יש יותר ממקור אחד)
+    if (createChildren) {
+      item.sources.forEach(function(src) {
+        var detail = "     ↳ " + src.name + " (" + src.quantity + ")";
+        table.push([detail, "", "", "", ""]);
+      });
+    }
   });
 
   if (table.length > 0) {
@@ -146,9 +168,9 @@ function writeToSheet(shoppingList) {
     
     // עיצוב
     sheet.setRightToLeft(true);
-    sheet.getRange(1, 1, 1, 4).setFontWeight("bold").setBackground("#e0e0e0");
+    sheet.getRange(1, 1, 1, 5).setFontWeight("bold").setBackground("#e0e0e0");
     parentRows.forEach(rowIndex => {
-      sheet.getRange(rowIndex, 1, 1, 4).setFontWeight("bold").setBackground("#f9f9f9");
+      sheet.getRange(rowIndex, 1, 1, 5).setFontWeight("bold").setBackground("#f9f9f9");
     });
   }
 }
