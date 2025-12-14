@@ -3,6 +3,7 @@
 Source of truth lives in `docs/_canon/`.
 
 ## Canon
+- Prompt Integrity Protocol (v1): `docs/_canon/workflow_prompt_integrity_protocol_v1.md`
 - Module 2.3 Tech Spec (v1.3.1): `docs/_canon/module_2_3_tech_spec_v1_3_1.md`
 - Module 2.3 UX Spec (v1.1.2): `docs/_canon/module_2_3_ux_spec_v1_1_2.md`
 
