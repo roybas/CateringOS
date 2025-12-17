@@ -516,5 +516,43 @@ Smart Split כמות לשני ספקים - לא; משתמשים בשכפול.
 
 מלאי/מחירים/חשבוניות/מחסן - מחוץ ל-V1.
 
+BEGIN PATCH (Tech Spec - Identifiers + Persistence)
 
+Identifiers and Persistence (Canonical)
+
+WORKSPACE is ephemeral
+	•	WORKSPACE is a rebuildable workspace view.
+	•	It is cleared and rebuilt on every Reload (batch write).
+	•	Therefore, WORKSPACE must not be the source of truth for decisions/learning.
+
+Persistent decisions store: DB_DECISIONS
+	•	Canonical sheet/tab name: DB_DECISIONS
+	•	Purpose: persist Shai’s explicit decisions so they survive Reload and do not depend on row order.
+
+Stored in DB_DECISIONS (learning only):
+	•	classification: Prep / Buy (Raw/Ready)
+	•	default supplier
+	•	default supplier spec
+	•	canonicalName and aliases mapping
+	•	conversion rules (unit ratios)
+	•	supplier terminology/alias name mapping
+
+Not stored in DB_DECISIONS:
+	•	per-event quantities
+	•	Delivery Day selection per draft
+	•	Order Note
+	•	Copy snapshots (snapshots belong to dedicated snapshot/log storage)
+
+Identifiers: deterministic only
+
+We define two identifiers. Both MUST be deterministic and MUST NOT be incremental.
+	•	itemKey:
+	•	Stable identity for “same item” across events/weeks.
+	•	Used as the primary key for persisted decisions in DB_DECISIONS.
+	•	sourceId:
+	•	Stable identity for a specific source row for traceability (Event + Station + original context).
+	•	Used for drill-down and audit mapping.
+
+Rule: any change in row ordering or insertion must not shift identifiers of unrelated rows.
+END PATCH (Tech Spec - Identifiers + Persistence)
 

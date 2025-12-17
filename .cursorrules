@@ -53,3 +53,8 @@ If the user asks for:
 - Product/UX decisions -> escalate to Lior (PM) and update canon docs.
 - Architecture/stack/data model decisions -> escalate to Yoav (CTO).
 - Complex implementation breakdown -> request a precise prompt from Tomer (Tech Lead).
+
+BEGIN PATCH (.cursorrules)
+	•	Decisions/learning MUST persist outside WORKSPACE (canonical: DB_DECISIONS). WORKSPACE remains ephemeral and rebuildable.
+END PATCH (.cursorrules)
+

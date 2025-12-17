@@ -48,6 +48,30 @@ Notes (performance):
 	•	No row-by-row writing in loops at this stage at all.
 
 Milestone 2 - Ingestion + Ephemeral Render to WORKSPACE
+
+BEGIN PATCH (M2 - Identifiers)
+
+Identifiers (M2 - must-have)
+
+We must create and persist two deterministic identifiers. No incremental IDs.
+	•	itemKey (learning key):
+	•	Purpose: stable identity for “the same item” across weeks/events for saving decisions/learning.
+	•	Used as the primary key in DB_DECISIONS.
+	•	Must be deterministic (hash), not dependent on row order.
+	•	sourceId (traceability key):
+	•	Purpose: stable identity for a specific source row (for traceability drills).
+	•	Derived deterministically from source context (Event + Station + original row context).
+	•	Must be deterministic (hash), not dependent on row order.
+
+Rules:
+	•	No guessing. If we cannot deterministically compute a component, we keep it explicit and separate.
+	•	Any change in menu order must NOT shift IDs of unrelated rows.
+
+Acceptance impact:
+	•	Renderer must output itemKey + sourceId into WORKSPACE alongside display fields, so decisions can be re-applied on rebuild.
+END PATCH (M2 - Identifiers)
+
+
 Goal: Reload Data loads the fixture JSON and renders a basic God View into WORKSPACE.
 Touched files:
 	•	services/drive_loader.js (or services/fixture_loader.js)
@@ -75,6 +99,45 @@ Edge handling:
 	•	If the parser fails to detect hierarchy - fallback to a flat list (still renders, does not crash)
 
 Milestone 3 - Sidebar Actions: Review Mode + Item Detail
+
+BEGIN PATCH (M3 - Persistence + Sync)
+
+Persistent decisions store (M3 - must-have)
+
+WORKSPACE remains ephemeral (rebuilt on every Reload). Therefore, “learning/decisions” must be persisted outside WORKSPACE.
+
+Create a dedicated persistent store:
+	•	Google Sheet tab: DB_DECISIONS (canonical name)
+	•	Purpose: store Shai’s explicit decisions so they survive Reload and menu changes.
+
+DB_DECISIONS stores only learning/decisions (not event-specific quantities):
+	•	classification: Prep / Buy (Raw/Ready)
+	•	supplier default
+	•	supplier spec default
+	•	canonicalName + aliases mapping
+	•	conversion rules (unit-to-unit ratios)
+	•	supplier alias/terminology (how the supplier expects the item name)
+
+Not stored here:
+	•	event quantities per run
+	•	Delivery Day selection per draft
+	•	Order Note
+	•	Snapshots of Copy (those belong to snapshot/log mechanism)
+
+Read/write flow:
+	•	On Reload: load entire DB_DECISIONS into memory first, then render WORKSPACE with decisions already applied.
+	•	On any Sidebar action that changes decisions: write back to DB_DECISIONS (single source of truth).
+
+Optimistic UI: Sync Status + Rollback (M3 - must-have)
+
+If Sidebar updates UI immediately (optimistic), the UI must also expose sync truth:
+	•	Sync state indicator: “שומר…” -> “נשמר”
+	•	On save failure: rollback UI to previous state + show error in Hebrew.
+
+This is required to prevent false confidence (Shai must never think a decision was saved when it wasn’t).
+END PATCH (M3 - Persistence + Sync)
+
+
 Goal: Make real decisions via Sidebar only and see them reflected in WORKSPACE.
 Touched files:
 	•	ui/sidebar.js (modes: Review, Item)
@@ -103,6 +166,14 @@ DoD / Acceptance Criteria:
 	◦	after saving in the sidebar, tags/fields in WORKSPACE change immediately (at least after refresh/render, preferably immediately with optimistic UI)
 No drift rule:
 	•	There is no mode that allows direct editing in WORKSPACE.
+
+
+BEGIN PATCH (M3 - DoD additions)
+	•	Decisions persist across Reload via DB_DECISIONS (not WORKSPACE).
+	•	Renderer applies persisted decisions on every rebuild.
+	•	Sidebar shows sync status (“שומר…”/“נשמר”) and rolls back on failure.
+END PATCH (M3 - DoD additions)
+
 
 Milestone 4 - Drafts + Preview + Copy + Snapshot + Dirty + Undo(1)
 Goal: Reach the truth point: Draft (Supplier+Day) -> Preview -> Copy -> Snapshot -> Dirty.
