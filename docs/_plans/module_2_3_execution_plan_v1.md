@@ -82,7 +82,7 @@ Touched files:
 Data structures (minimum workable):
 	•	ItemSource:
 	◦	eventName, stationName, itemNameRaw, qty, unit
-	◦	sourceId (stable - hash or deterministic incremental)
+	◦	sourceId (stable - deterministic hash only)
 	•	WorkspaceRow:
 	◦	rowId, rowType (PARENT/CHILD), displayItemName, displayQty, displayUnit
 	◦	traceSourceIds[] (on Parent row)
