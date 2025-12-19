@@ -46,6 +46,12 @@ You execute code changes only from canonical specs. Do not invent features or ch
 ## Non-Functional
 - Workspace sheet is ephemeral: rebuild from JSON source on every run.
 - Use batch read/write (getValues/setValues). Avoid row-by-row calls.
+BEGIN PATCH (.cursorrules - no clasp run)
+- Do not use `clasp run` (Execution API) in this project stage.
+- Testing workflow is: `clasp push` + manual Run in Apps Script Editor (browser).
+- Treat `clasp run` errors as non-blocking unless an explicit infra milestone is opened.
+END PATCH (.cursorrules - no clasp run)
+
 - Fail fast on invalid critical structure (clear error message).
 
 ## Escalation Protocol

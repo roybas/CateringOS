@@ -45,6 +45,28 @@ DoD / Acceptance Criteria:
 	•	There is a check that WORKSPACE exists, and if not - it is created
 	•	There is no editing in the table (no onEdit flow, no UI that allows editing a cell)
 Notes (performance):
+
+BEGIN PATCH (Workflow - Hybrid execution, no clasp run)
+
+Workflow (Development + Testing - canonical for now)
+
+We do NOT use `clasp run` at this stage.
+Reason: Execution API / auth / deployment coupling causes drift between @HEAD and deployed versions, and wastes time. Out of scope for V1.
+
+Canonical workflow:
+	•	Write code in Cursor (local repo)
+	•	`clasp push`
+	•	Run / test manually inside Apps Script Editor (browser) only
+	•	Ignore `clasp run` terminal errors (non-blocker)
+
+Definition note:
+	•	Any “Run” / “Test” / “Execute” mentioned in Milestones below means: manual Run in Apps Script Editor (not terminal).
+
+Re-open condition:
+	•	Only reopen Execution API / `clasp run` if a concrete acceptance test requires automated execution, and we explicitly create an infra milestone.
+
+END PATCH (Workflow - Hybrid execution, no clasp run)
+
 	•	No row-by-row writing in loops at this stage at all.
 
 Milestone 2 - Ingestion + Ephemeral Render to WORKSPACE

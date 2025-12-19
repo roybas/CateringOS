@@ -516,6 +516,19 @@ Smart Split כמות לשני ספקים - לא; משתמשים בשכפול.
 
 מלאי/מחירים/חשבוניות/מחסן - מחוץ ל-V1.
 
+BEGIN PATCH (Canonical - Execution workflow)
+
+Execution workflow (Canonical)
+
+We do NOT rely on `clasp run` / Execution API during V1 development.
+Canonical execution/testing is:
+	•	`clasp push`
+	•	Manual Run + UI testing inside Apps Script Editor (browser)
+
+Infra (GCP / Execution API / OAuth automation) is explicitly out of scope unless reopened as a dedicated milestone.
+
+END PATCH (Canonical - Execution workflow)
+
 BEGIN PATCH (Tech Spec - Identifiers + Persistence)
 
 Identifiers and Persistence (Canonical)
