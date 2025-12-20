@@ -5,34 +5,221 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    :root {
+      --bg: #0b1220;
+      --panel: rgba(255,255,255,0.06);
+      --panel2: rgba(0,0,0,0.14);
+      --text: #e6eefc;
+      --muted: #a7b7d6;
+      --primary: #4f8cff;
+      --primary2: #3a73e8;
+      --border: rgba(255,255,255,0.10);
+      --shadow: 0 10px 24px rgba(0,0,0,0.28);
+      --radius: 14px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Hebrew", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      padding: 20px;
-      background-color: #f9f9f9;
-      color: #333;
+      font-family: var(--font);
+      background: radial-gradient(900px 700px at 10% 0%, #0f2b5a 0%, var(--bg) 55%);
+      color: var(--text);
     }
-    
-    h1 {
-      font-size: 24px;
-      font-weight: 600;
-      margin: 0 0 20px 0;
-      color: #1a73e8;
+
+    .wrap { padding: 14px; }
+
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
     }
-    
-    .status {
-      padding: 12px 16px;
-      background-color: #e8f5e9;
-      border-right: 4px solid #4caf50;
-      border-radius: 4px;
-      font-size: 16px;
-      color: #2e7d32;
+
+    .title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .sub {
+      margin-top: 4px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #9aa8c2;
+    }
+    .dot.ok { background: #43d17a; }
+    .dot.bad { background: #ff5c7a; }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panelHeader {
+      padding: 12px 12px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.12);
+    }
+
+    .panelBody { padding: 12px; }
+
+    .btnRow { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    button {
+      appearance: none;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+      background: rgba(255,255,255,0.06);
+      cursor: pointer;
+    }
+    button.primary {
+      background: linear-gradient(180deg, var(--primary), var(--primary2));
+      border-color: rgba(79,140,255,0.55);
+    }
+    button.secondary {
+      background: rgba(255,255,255,0.04);
+    }
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .meta {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
-  <h1>לוח רכש</h1>
-  <div class="status">מוכן</div>
+  <div class="wrap">
+    <div class="header">
+      <div>
+        <h1 class="title">לוח רכש</h1>
+        <div class="sub">
+          הסיידבר צר ברוחב קבוע ב‑Google Sheets. לתצוגה רחבה אפשר לפתוח חלון נפרד.
+        </div>
+      </div>
+      <div class="badge" title="בדיקת חיבור לשרת">
+        <span class="dot" id="connDot"></span>
+        <span id="connText">בודק…</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panelHeader">
+        <div class="badge">
+          <span class="dot ok"></span>
+          <span>מצב: בסיס UI מוכן</span>
+        </div>
+      </div>
+      <div class="panelBody">
+        <div class="btnRow">
+          <button class="primary" id="btnWide" onclick="openWide()">פתח תצוגה רחבה</button>
+          <button class="secondary" id="btnPing" onclick="pingServer()">בדיקת שרת</button>
+        </div>
+
+        <div class="hint">
+          אם “שמירה” לוקחת 2–3 שניות — בהרבה מקרים זה מגיע מפעולות עיצוב כבדות בטבלה (כמו Auto‑resize).
+          ביטלתי Auto‑resize ובחרתי רוחבי עמודות קבועים כדי להאיץ רענון.
+        </div>
+
+        <div class="meta" id="meta"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setConn(ok, text) {
+      const dot = document.getElementById('connDot');
+      const t = document.getElementById('connText');
+      dot.classList.toggle('ok', !!ok);
+      dot.classList.toggle('bad', ok === false);
+      t.textContent = text;
+    }
+
+    function setMeta(text) {
+      document.getElementById('meta').textContent = text || '';
+    }
+
+    function pingServer() {
+      const btn = document.getElementById('btnPing');
+      btn.disabled = true;
+      setConn(null, 'בודק…');
+      setMeta('');
+
+      const started = Date.now();
+      google.script.run
+        .withSuccessHandler((res) => {
+          const ms = Date.now() - started;
+          setConn(true, `מחובר (${ms}ms)`);
+          setMeta(`Ping: ${String(res)} • ${ms}ms`);
+          btn.disabled = false;
+        })
+        .withFailureHandler((err) => {
+          setConn(false, 'שגיאה');
+          setMeta(`שגיאה: ${err && err.message ? err.message : String(err)}`);
+          btn.disabled = false;
+        })
+        .ping();
+    }
+
+    function openWide() {
+      const btn = document.getElementById('btnWide');
+      btn.disabled = true;
+      google.script.run
+        .withSuccessHandler(() => { btn.disabled = false; })
+        .withFailureHandler((err) => {
+          setMeta(`שגיאה בפתיחת תצוגה רחבה: ${err && err.message ? err.message : String(err)}`);
+          btn.disabled = false;
+        })
+        .showProcurementDialog_();
+    }
+
+    // Auto ping on load
+    pingServer();
+  </script>
 </body>
 </html>
 

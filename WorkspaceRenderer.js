@@ -126,9 +126,14 @@ function renderWorkspace_(spreadsheetId, workspaceSheetName, itemSources, eventI
   
   // Hide the rowType column (column 6)
   workspace.hideColumns(6, 4);
-  
-  // Auto-resize columns
-  workspace.autoResizeColumns(1, 5);
+
+  // Set stable column widths (faster than autoResize on every rebuild)
+  // NOTE: WORKSPACE is ephemeral; widths are purely UX and safe to override.
+  workspace.setColumnWidth(1, 110); // מצב
+  workspace.setColumnWidth(2, 320); // שם פריט
+  workspace.setColumnWidth(3, 180); // ספק
+  workspace.setColumnWidth(4, 140); // סה"כ
+  workspace.setColumnWidth(5, 260); // הקשר
   
   Logger.log(`Rendered ${rows.length - 1} rows to WORKSPACE`);
 }
