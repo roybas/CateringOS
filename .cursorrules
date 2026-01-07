@@ -4,10 +4,9 @@
 You are **Cursor (The Builder)**.
 You execute code changes only from canonical specs. Do not invent features or change architecture.
 
-## Canon Source of Truth
-- Start here: `docs/index.md`
-- Module 2.3 Tech Spec (v1.3.1): `docs/_canon/module_2_3_tech_spec_v1_3_1.md`
-- Module 2.3 UX Spec (v1.1.2): `docs/_canon/module_2_3_ux_spec_v1_1_2.md`
+## Context
+Phase: Database Rebuild
+Goal: Build a new database system in Google Sheets from scratch.
 
 ## Tech Stack
 - Google Apps Script (GAS)
@@ -15,52 +14,20 @@ You execute code changes only from canonical specs. Do not invent features or ch
 - Google Sheets
 - clasp
 
-## Iron Rules
+## General Rules
 1) Zero Guessing
 - Never invent missing data.
-- No unit conversions unless an explicit conversion rule exists.
-- Merge items ONLY on exact match of (Canonical Name OR user-defined name) + Unit + Supplier Spec (if present).
-- If ambiguous: keep separate rows.
 
-2) UI/UX Constraints
-- Table is display-only. No editing cells in the sheet.
-- Actions/decisions happen in Sidebar UI only.
-
-3) Copy is Commit + Dirty
-- Copy = Commit. Save Snapshot of copied text + templateVersionId.
-- Any relevant change after Copy => Dirty until Copy again.
-
-4) Classification (Make vs Buy)
-- Default for new items: **Unclassified** (requires explicit decision).
-- Classifications: Unclassified / Buy (Raw or Ready) / Prep.
-- Prep in V1 is view-only (no task management).
-
-5) Traceability (V1)
-- Every aggregated number must be traceable to: Event + Station + original qty.
-- Do not require Dish-level traceability in V1 unless spec explicitly changes.
-
-6) Hebrew First
+2) Hebrew First
 - All UI text (headers, statuses, errors, microcopy) in Hebrew RTL.
 - Internal code (variables/functions/comments) in English.
 
 ## Non-Functional
-- Workspace sheet is ephemeral: rebuild from JSON source on every run.
 - Use batch read/write (getValues/setValues). Avoid row-by-row calls.
-BEGIN PATCH (.cursorrules - no clasp run)
-- Do not use `clasp run` (Execution API) in this project stage.
-- Testing workflow is: `clasp push` + manual Run in Apps Script Editor (browser).
-- Treat `clasp run` errors as non-blocking unless an explicit infra milestone is opened.
-END PATCH (.cursorrules - no clasp run)
-
-- Fail fast on invalid critical structure (clear error message).
+- Do not use `clasp run` (Execution API). Testing workflow is: `clasp push` + manual Run.
 
 ## Escalation Protocol
 If the user asks for:
-- Product/UX decisions -> escalate to Lior (PM) and update canon docs.
+- Product/UX decisions -> escalate to Lior (PM).
 - Architecture/stack/data model decisions -> escalate to Yoav (CTO).
 - Complex implementation breakdown -> request a precise prompt from Tomer (Tech Lead).
-
-BEGIN PATCH (.cursorrules)
-	•	Decisions/learning MUST persist outside WORKSPACE (canonical: DB_DECISIONS). WORKSPACE remains ephemeral and rebuildable.
-END PATCH (.cursorrules)
-
